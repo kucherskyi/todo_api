@@ -1,17 +1,14 @@
-#!env/bin/python
+#!venv/bin/python
 
-from flask import Flask
+from flask import Flask, render_template
+from flask_restful import Resource, Api
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+api = Api(app)
 
 app.config.from_object('config')
-
 db = SQLAlchemy(app)
 
-
-@app.errorhandler(404)
-def not_found(error):
-    return '404', 404
-
+from mod import controllers
 db.create_all()
