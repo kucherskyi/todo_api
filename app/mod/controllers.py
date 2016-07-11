@@ -116,12 +116,53 @@ def delete_task(id):
     return jsonify({'status': 'deleted'}, 200)
 
 
-@app.route('/api/att', methods=['POST'])
-def new_att():
+@app.route('/api/attachments')
+def get_attachments():
+    attachment = Attachment.query.all()
+    al = []
+    for row in attachment:
+        al.append({'attachment': row.owner})
+    return jsonify(al)
+
+
+@app.route('/api/attachments', methods=['POST'])
+def new_attachment():
     owner = request.json.get('owner')
-    file_url = request.json.get('url')
+    file_url = request.json.get('file_url')
     task_id = request.json.get('task_id')
-    atta = Attachment(owner=owner, task_id = task_id, file_url=file_url)
-    db.session.add(atta)
+
+    attachment = Attachment(owner=owner, file_url=file_url, status=status, task_id = task_id)
+    db.session.add(attachment)
     db.session.commit()
-    return (jsonify({'created': atta.title}), 201)
+    return (jsonify({'created': attachment.owner}), 201)
+
+
+@app.route('/api/attachments/<int:id>')
+
+def get_attachment(id):
+    attachment = Attachment.query.get(id)
+    if not attachment:
+        abort(400)
+    return jsonify({attachment.owner: attachment.file_url})
+
+
+@app.route('/api/attachments/<int:id>', methods=['PUT'])
+def update_attachment(id):
+    attachment = Attachment.query.get(id)
+    if not attachment:
+        abort(400)
+    attachment.owner = request.json.get('owner')
+    attachment.updated_at = str(datetime.datetime.now())
+    db.session.add(attachment)
+    db.session.commit()
+    return jsonify({attachment.owner: attachment.owner})
+
+
+@app.route('/api/attachments/<int:id>', methods=['DELETE'])
+def delete_attachment(id):
+    attachment = Attachment.query.get(id)
+    if not attachment:
+        abort(400)
+    db.session.delete(attachment)
+    db.session.commit()
+    return jsonify({'status': 'deleted'}, 200)

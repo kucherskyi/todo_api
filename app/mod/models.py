@@ -33,13 +33,12 @@ class Task(Base):
     title = db.Column(db.String(32))
     description = db.Column(db.String(100))
     status = db.Column(db.String(10))
-    att = db.relationship('Attachment', backref="post", cascade="all, delete-orphan" , lazy='dynamic')
 
 
 class Attachment(Base):
     __tablename__ = 'attachments'
     owner = db.Column(db.String(100))
     file_url = db.Column(db.String(10))
-    task_id = db.Column(db.Integer, db.ForeignKey('Task.id'))
+    task_id = db.Column(db.Integer)
 
     
